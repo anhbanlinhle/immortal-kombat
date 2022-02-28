@@ -7,7 +7,7 @@
 
 
 - cd into this project
-- run the following command line: 
+- run the following commands: 
 ```bash
 make
 ```
