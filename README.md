@@ -10,7 +10,7 @@
 - run the following command line: 
 ```bash
 make
-
-
+```
+```bash
 ./build/debug/play
 ```
