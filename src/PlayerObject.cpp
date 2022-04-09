@@ -21,8 +21,8 @@ PlayerObject::PlayerObject(){
     input_type.attack_left = 0;
     input_type.attack_right = 0;
 
-    input_type.kick_left = 0;
-    input_type.kick_right = 0;
+    input_type.up_left = 0;
+    input_type.up_right = 0;
 
     input_type.down_left = 0;
     input_type.down_right = 0;
@@ -145,7 +145,7 @@ void PlayerObject::HandleInputAction(SDL_Event events, SDL_Renderer* screen){
                 case SDLK_q:{
                     if(CheatLock != 1){
                         if(PlayerStatus == WALK_LEFT)
-                        input_type.kick_left = 1;
+                        input_type.up_left = 1;
                         Counter++;
                     }
                 }
@@ -154,7 +154,7 @@ void PlayerObject::HandleInputAction(SDL_Event events, SDL_Renderer* screen){
                 case SDLK_e:{
                     if(CheatLock != 1){
                         if(PlayerStatus == WALK_RIGHT)
-                        input_type.kick_right = 1;
+                        input_type.up_right = 1;
                         Counter++;
                     }
                 }
@@ -217,14 +217,14 @@ void PlayerObject::HandleInputAction(SDL_Event events, SDL_Renderer* screen){
             break;
 
             case SDLK_q:{
-                input_type.kick_left = 0;
+                input_type.up_left = 0;
                 Counter = 0;
                 CheatLock = 0;
             }
             break;
 
             case SDLK_e:{
-                input_type.kick_right = 0;
+                input_type.up_right = 0;
                 Counter = 0;
                 CheatLock = 0;
             }
@@ -386,9 +386,9 @@ std::string PlayerObject::HitState(){
 
     if(input_type.attack_left == 1) return "left";
 
-    if(input_type.kick_right == 1) return "up_right";
+    if(input_type.up_right == 1) return "up_right";
 
-    if(input_type.kick_left == 1) return "up_left";
+    if(input_type.up_left == 1) return "up_left";
 
     if(input_type.down_right == 1) return "down_right";
 
@@ -404,6 +404,7 @@ bool PlayerObject::Defend(){
 void PlayerObject::RefreshFrame(SDL_Renderer* des){
     if(OnGround == 1){
         if(PlayerStatus == WALK_LEFT){
+
             if(input_type.left == 1){
                 LoadImg("./img/char_1/walk_left.png", des);
             }
@@ -418,11 +419,15 @@ void PlayerObject::RefreshFrame(SDL_Renderer* des){
                 LoadImg("./img/char_1/punch_left.png", des);
             }
             else if(input_type.attack_right){
-                LoadImg("./img/char_1/punch_right.png", des);
+                LoadImg("./img/char_1/back_left.png", des);
             }
 
-            if(input_type.kick_left == 1){
+            if(input_type.up_left == 1){
                 LoadImg("./img/char_1/kick_left.png", des);
+            }
+
+            if(input_type.down_left == 1){
+                LoadImg("./img/char_1/low_left.png", des);
             }
         }
         else{
@@ -437,25 +442,43 @@ void PlayerObject::RefreshFrame(SDL_Renderer* des){
             }
 
             if(input_type.attack_left){
-                LoadImg("./img/char_1/punch_left.png", des);
+                LoadImg("./img/char_1/back_right.png", des);
             }
             else if(input_type.attack_right){
                 LoadImg("./img/char_1/punch_right.png", des);
             }
 
-            if(input_type.kick_right == 1){
+            if(input_type.up_right == 1){
                 LoadImg("./img/char_1/kick_right.png", des);
             }
+
+            if(input_type.down_right == 1){
+                LoadImg("./img/char_1/low_right.png", des);
+            }
         }
-    
-        
     }
     else{
         if(PlayerStatus == WALK_LEFT){
-            LoadImg("./img/char_1/jump_left.png", des);
+            if(input_type.attack_left == 1){
+                LoadImg("./img/char_1/up_left.png", des);
+            }
+            else if(input_type.down_left == 1){
+                LoadImg("./img/char_1/strike_left.png", des);
+            }
+            else{
+                LoadImg("./img/char_1/jump_left.png", des);
+            }
         }
         else{
-            LoadImg("./img/char_1/jump_right.png", des);
+            if(input_type.attack_right == 1){
+                LoadImg("./img/char_1/up_right.png", des);
+            }
+            else if(input_type.down_right == 1){
+                LoadImg("./img/char_1/strike_right.png", des);
+            }
+            else{
+                LoadImg("./img/char_1/jump_right.png", des);
+            }
         }
     }
 }
@@ -468,8 +491,8 @@ void PlayerObject::AntiCheat(){
         input_type.attack_left = 0;
         input_type.attack_right = 0;
 
-        input_type.kick_left = 0;
-        input_type.kick_right = 0;
+        input_type.up_left = 0;
+        input_type.up_right = 0;
 
         input_type.down_left = 0;
         input_type.down_right = 0;

@@ -23,6 +23,7 @@ class PlayerObjectTwo : public BaseObject{
 
         std::string HitState();
         bool Defend();
+        void AntiCheat();
 
         bool LoadImg(std::string path, SDL_Renderer* screen);
         void Show(SDL_Renderer* des);
@@ -69,6 +70,9 @@ class PlayerObjectTwo : public BaseObject{
         int map_y; 
 
         int come_back_time;
+
+        bool CheatLock;
+        int Counter;
 };
 
 

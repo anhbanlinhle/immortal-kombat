@@ -307,6 +307,9 @@ bool CheckCollision(const SDL_Rect& object1, const SDL_Rect& object2);
 // Check position
 std::string CheckPosition(const SDL_Rect& objectA, const SDL_Rect& objectB);
 
+// Check hit
+std::string HitConfirm(std::string HitState, std::string Position);
+
 int main(int argc, char* argv[]){
     Timer fps_timer;
 
@@ -353,8 +356,8 @@ int main(int argc, char* argv[]){
             if(g_event.type == SDL_QUIT)
                 quit_game = true;
 
-        p_player.HandleInputAction(g_event, g_screen);
-        p_player_two.HandleInputAction(g_event, g_screen);
+            p_player.HandleInputAction(g_event, g_screen);
+            p_player_two.HandleInputAction(g_event, g_screen);
         }
 
         SDL_SetRenderDrawColor(g_screen, 
@@ -388,24 +391,30 @@ int main(int argc, char* argv[]){
         bool InRange = CheckCollision(rect_player_one, rect_player_two);
         if(InRange){
             if(p_player.HitState() != "idle"){
-                HitTaken_2++;
-                if(HitTaken_2 <= 10){
-                    p_player_two.SetRect(SCREEN_WIDTH,0);
-                    p_player_two.ComeBackTime(1);
-                    SDL_Delay(100);
-                    continue;
+                if(!p_player_two.Defend()){
+                    if(HitConfirm(p_player.HitState(),
+                       CheckPosition(rect_player_one, rect_player_two))
+                       != "No"){
+                        HitTaken_2++;
+                        if(HitTaken_2 <= 100){
+                            p_player_two.SetRect(SCREEN_WIDTH,0);
+                            p_player_two.ComeBackTime(1);
+                            SDL_Delay(100);
+                            continue;
 
-                }
-                else{
-                   SDL_Quit();
-                   return 0;
+                        }
+                        else{
+                            SDL_Quit();
+                            return 0;
+                        }
+                    }
                 }
             }
             if(p_player_two.HitState()!= "idle"){
                 
                 if(!p_player.Defend()){
                     HitTaken_1++;
-                    if(HitTaken_1 <= 10){
+                    if(HitTaken_1 <= 100){
                         p_player.SetRect(0,0);
                         p_player.ComeBackTime(1);
                         SDL_Delay(100);
@@ -440,7 +449,7 @@ int main(int argc, char* argv[]){
         // Show Lives
         std::string char_1_lives = "HP: ";
         if(HitTaken_1 <= 10){
-            std::string display_lives_1 = std::to_string(10 - HitTaken_1);
+            std::string display_lives_1 = std::to_string(100 - HitTaken_1);
             char_1_lives += display_lives_1;
 
             Char1.SetText(char_1_lives);
@@ -450,7 +459,7 @@ int main(int argc, char* argv[]){
 
         std::string char_2_lives = "HP: ";
         if(HitTaken_2 <= 10){
-            std::string display_lives_2 = std::to_string(10 - HitTaken_2);
+            std::string display_lives_2 = std::to_string(100 - HitTaken_2);
             char_2_lives += display_lives_2;
 
             Char2.SetText(char_2_lives);
@@ -568,7 +577,7 @@ bool CheckCollision(const SDL_Rect& objectA, const SDL_Rect& objectB){
   int dis_x = abs(center_a_x-center_b_x)+10;
   int dis_y = abs(center_a_y-center_b_y)+20;
 
-  if(dis_x <= objectA.w && dis_y <= objectB.h)
+  if(dis_x <= objectB.w && dis_y <= objectB.h)
     return 1;
  
   return 0;
@@ -592,10 +601,10 @@ std::string CheckPosition(const SDL_Rect& objectA, const SDL_Rect& objectB){
     }
 
     if(center_a_y < center_b_y){
-        pos_y = "down ";
+        pos_y = "down_";
     }
     else if(center_a_y > center_b_y){
-        pos_y = "up ";
+        pos_y = "up_";
     }
 
     if(center_a_x == center_b_x && 
@@ -603,4 +612,40 @@ std::string CheckPosition(const SDL_Rect& objectA, const SDL_Rect& objectB){
        return "same spot";
     
     return pos_y + pos_x;
+}
+
+std::string HitConfirm(std::string HitState, std::string Position){
+    std::string Confirm = "No";
+        if(HitState == "right"){
+            if(Position == "right"){
+                Confirm = "Yes";
+            }
+        }
+        else if(HitState == "left"){
+            if(Position == "left"){
+                Confirm = "Yes";
+            }
+        }
+        else if(HitState == "up_right"){
+            if(Position == "up_right"){
+                Confirm = "Yes";
+            }
+        }
+        else if(HitState == "up_left"){
+            if(Position == "up_left"){
+                Confirm = "Yes";
+            }
+        }
+        else if(HitState == "down_right"){
+            if(Position == "down_right" || Position == "right"){
+                Confirm = "Yes";
+            }
+        }
+        else if(HitState == "down_left"){
+            if(Position == "down_left" || Position == "left"){
+                Confirm = "Yes";
+            }
+        }       
+
+    return Confirm;
 }

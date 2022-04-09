@@ -41,6 +41,7 @@ class PlayerObject : public BaseObject{
         void RefreshFrame(SDL_Renderer* des);
 
         SDL_Rect GetRectFrame();
+        
         void ComeBackTime(const int& cb_time){
             come_back_time = cb_time;
         };

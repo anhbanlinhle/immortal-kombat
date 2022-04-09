@@ -11,17 +11,29 @@ PlayerObjectTwo::PlayerObjectTwo(){
     width_frame = 0;
     height_frame = 0;
     PlayerStatus = 1;
+
     input_type.left = 0;
     input_type.right = 0;
+
     input_type.jump = 0;
     input_type.down = 0;
     
     input_type.attack_left = 0;
     input_type.attack_right = 0;
+
+    input_type.up_left = 0;
+    input_type.up_right = 0;
+
+    input_type.down_left = 0;
+    input_type.down_right = 0;
+
     OnGround = 0;
     map_x = 0;
     map_y = 0;
     come_back_time = 0;
+
+    CheatLock = 0;
+    Counter = 0;
 }
 
 PlayerObjectTwo::~PlayerObjectTwo(){
@@ -62,22 +74,9 @@ void PlayerObjectTwo::SetClips(){
 
 void PlayerObjectTwo::Show(SDL_Renderer* des){
     RefreshFrame(des);
-    if(input_type.attack_left){
-        LoadImg("./img/char_2/punch_left.png", des);
-    }
-    else if(input_type.attack_right){
-        LoadImg("./img/char_2/punch_right.png", des);
-    }
-    if(input_type.down){
-        if(PlayerStatus == WALK_LEFT){
-            LoadImg("", des);
-        }
-        else{
-            LoadImg("", des);
-        }
-    }
 
     frame++;
+    AntiCheat();
 
     if(frame >= 12){
         frame = 0;
@@ -100,75 +99,154 @@ void PlayerObjectTwo::Show(SDL_Renderer* des){
 
 void PlayerObjectTwo::HandleInputAction(SDL_Event events, SDL_Renderer* screen){
     if(events.type == SDL_KEYDOWN){
-        switch(events.key.keysym.sym){
-            case SDLK_RIGHT:{
-                PlayerStatus = WALK_RIGHT;
-                input_type.right = 1;
-                input_type.left = 0;
-                RefreshFrame(screen);
-            }
-            break;
+                switch(events.key.keysym.sym){
+                    case SDLK_RIGHT:{
+                        PlayerStatus = WALK_RIGHT;
+                        input_type.right = 1;
+                        input_type.left = 0;
+                        RefreshFrame(screen);
+                    }
+                    break;
 
-            case SDLK_LEFT:{
-                PlayerStatus = WALK_LEFT;
-                input_type.left = 1;
-                input_type.right = 0;
-                RefreshFrame(screen);
-            }
-            break;
+                    case SDLK_LEFT:{
+                        PlayerStatus = WALK_LEFT;
+                        input_type.left = 1;
+                        input_type.right = 0;
+                        RefreshFrame(screen);
+                    }
+                    break;
 
-            case SDLK_UP:{
-                input_type.jump = 1;
-            }
-            break;
+                    case SDLK_UP:{
+                        input_type.jump = 1;
+                    }
+                    break;
 
-            case SDLK_DOWN:{
-                input_type.down = 1;
-            }
-            break;
+                    case SDLK_DOWN:{
+                        input_type.down = 1;
+                    }
+                    break;
 
-            case SDLK_m:{
-                input_type.attack_right = 1;
-            }
-            break;
+                    case SDLK_i:{
+                        if(CheatLock != 1){
+                            input_type.attack_left = 1;
+                            Counter++;
+                        }
+                    }
+                    break;
 
-            case SDLK_n:{
-                input_type.attack_left = 1;
+                    case SDLK_o:{
+                        if(CheatLock != 1){
+                            input_type.attack_right = 1;
+                            Counter++;
+                        }
+                    }
+                    break;
+
+                    case SDLK_u:{
+                        if(CheatLock != 1){
+                            if(PlayerStatus == WALK_LEFT)
+                            input_type.up_left = 1;
+                            Counter++;
+                        }
+                    }
+                    break;
+
+                    case SDLK_p:{
+                        if(CheatLock != 1){
+                            if(PlayerStatus == WALK_RIGHT)
+                            input_type.up_right = 1;
+                            Counter++;
+                        }
+                    }
+                    break;
+
+                    case SDLK_k:{
+                        if(CheatLock != 1)
+                        if(PlayerStatus == WALK_LEFT)
+                            input_type.down_left = 1;
+                    }
+                    break;
+
+                    case SDLK_l:{
+                        if(CheatLock != 1)
+                        if(PlayerStatus == WALK_RIGHT)
+                            input_type.down_right = 1;
+                    }
+                    break;
+                }
+            
+        }
+        else if(events.type == SDL_KEYUP){
+            switch(events.key.keysym.sym){
+                case SDLK_RIGHT:{
+                    input_type.right = 0;
+                    
+                }
+                break;
+
+                case SDLK_LEFT:{
+                    input_type.left = 0;
+                    
+                }
+                break;
+
+                case SDLK_UP:{
+                    
+                }
+                break;
+
+                case SDLK_DOWN:{
+                    input_type.down = 0;
+                    Counter = 0;
+                    CheatLock = 0;
+                }
+                break;
+
+                case SDLK_i:{
+                    input_type.attack_left = 0;
+                    Counter = 0;
+                    CheatLock = 0;
+                }
+                break;
+
+                case SDLK_o:{
+                    input_type.attack_right = 0;
+                    Counter = 0;
+                    CheatLock = 0;
+                }
+                break;
+
+                case SDLK_u:{
+                    input_type.up_left = 0;
+                    Counter = 0;
+                    CheatLock = 0;
+                }
+                break;
+
+                case SDLK_p:{
+                    input_type.up_right = 0;
+                    Counter = 0;
+                    CheatLock = 0;
+                }
+                break;
+
+                case SDLK_k:{
+                    input_type.down_left = 0;
+                    Counter = 0;
+                    CheatLock = 0;
+                }
+                break;
+
+                case SDLK_l:{
+                    input_type.down_right = 0;
+                    Counter = 0;
+                    CheatLock = 0;
+                }
+                break;
             }
-            break;
+            frame = 0;
         }
     }
-    else if(events.type == SDL_KEYUP){
-        switch(events.key.keysym.sym){
-            case SDLK_RIGHT:
-            {
-                input_type.right = 0;
-            }
-            break;
-
-            case SDLK_LEFT:{
-                input_type.left = 0;
-            }
-            break;
-
-            case SDLK_DOWN:{
-                input_type.down = 0;
-            }
-            break;
-
-            case SDLK_m:{
-                input_type.attack_right = 0;
-            }
-            break;
-
-            case SDLK_n:{
-                input_type.attack_left = 0;
-            }
-            break;
-        }
-        frame = 0;
-    }
-}
 
 void PlayerObjectTwo::DoPlayer(Map& map_data){
     if(come_back_time == 0){
@@ -200,6 +278,7 @@ void PlayerObjectTwo::DoPlayer(Map& map_data){
     if(come_back_time > 0){
         come_back_time--;
         if(come_back_time == 0){
+            OnGround = 0;
             x_pos = SCREEN_WIDTH;
             y_pos = 0;
 
@@ -307,9 +386,9 @@ std::string PlayerObjectTwo::HitState(){
 
     if(input_type.attack_left == 1) return "left";
 
-    if(input_type.kick_right == 1) return "up_right";
+    if(input_type.up_right == 1) return "up_right";
 
-    if(input_type.kick_left == 1) return "up_left";
+    if(input_type.up_left == 1) return "up_left";
 
     if(input_type.down_right == 1) return "down_right";
 
@@ -325,28 +404,99 @@ bool PlayerObjectTwo::Defend(){
 void PlayerObjectTwo::RefreshFrame(SDL_Renderer* des){
     if(OnGround == 1){
         if(PlayerStatus == WALK_LEFT){
+
             if(input_type.left == 1){
                 LoadImg("./img/char_2/walk_left.png", des);
             }
+            else if(input_type.down == 1){
+                LoadImg("./img/char_2/defense_left.png", des);
+            }
             else{
                 LoadImg("./img/char_2/idle_left.png", des);
+            }
+
+            if(input_type.attack_left){
+                LoadImg("./img/char_2/punch_left.png", des);
+            }
+            else if(input_type.attack_right){
+                LoadImg("./img/char_2/back_left.png", des);
+            }
+
+            if(input_type.up_left == 1){
+                LoadImg("./img/char_2/kick_left.png", des);
+            }
+
+            if(input_type.down_left == 1){
+                LoadImg("./img/char_2/low_left.png", des);
             }
         }
         else{
             if(input_type.right == 1){
                 LoadImg("./img/char_2/walk_right.png", des);
             }
+            else if(input_type.down == 1){
+                LoadImg("./img/char_2/defense_right.png", des);
+            }
             else{
                 LoadImg("./img/char_2/idle_right.png", des);
+            }
+
+            if(input_type.attack_left){
+                LoadImg("./img/char_2/back_right.png", des);
+            }
+            else if(input_type.attack_right){
+                LoadImg("./img/char_2/punch_right.png", des);
+            }
+
+            if(input_type.up_right == 1){
+                LoadImg("./img/char_2/kick_right.png", des);
+            }
+
+            if(input_type.down_right == 1){
+                LoadImg("./img/char_2/low_right.png", des);
             }
         }
     }
     else{
         if(PlayerStatus == WALK_LEFT){
-            LoadImg("./img/char_2/jump_left.png", des);
+            if(input_type.attack_left == 1){
+                LoadImg("./img/char_2/up_left.png", des);
+            }
+            else if(input_type.down_left == 1){
+                LoadImg("./img/char_2/strike_left.png", des);
+            }
+            else{
+                LoadImg("./img/char_2/jump_left.png", des);
+            }
         }
         else{
-            LoadImg("./img/char_2/jump_right.png", des);
+            if(input_type.attack_right == 1){
+                LoadImg("./img/char_2/up_right.png", des);
+            }
+            else if(input_type.down_right == 1){
+                LoadImg("./img/char_2/strike_right.png", des);
+            }
+            else{
+                LoadImg("./img/char_2/jump_right.png", des);
+            }
         }
+    }
+}
+
+void PlayerObjectTwo::AntiCheat(){
+    if(Counter >= 6){
+        input_type.jump = 0;
+        input_type.down = 0;
+
+        input_type.attack_left = 0;
+        input_type.attack_right = 0;
+
+        input_type.up_left = 0;
+        input_type.up_right = 0;
+
+        input_type.down_left = 0;
+        input_type.down_right = 0;
+
+        CheatLock = 1;
     }
 }

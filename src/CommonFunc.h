@@ -47,8 +47,8 @@ struct Input{
     int attack_left;
     int attack_right;
 
-    int kick_left;
-    int kick_right;
+    int up_left;
+    int up_right;
     
     int down_left;
     int down_right;
