@@ -375,7 +375,7 @@ void PlayerObjectTwo::CheckCollideMap(Map& map_data){
         x_pos = map_data.max_x - width_frame - 1;
     }
 
-    if(y_pos + height_frame > map_data.max_y){
+    if(y_pos + height_frame >= map_data.max_y){
         y_pos = map_data.max_y - height_frame - TILE_SIZE - 1;
         OnGround = 1;
     }

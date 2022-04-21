@@ -288,6 +288,9 @@
 #include "PlayerObjectTwo.h"
 #include "Timer.h"
 #include "TextObject.h"
+#include "Geometric.h"
+#include "CharOneHP.h"
+#include "CharTwoHP.h"
 
 BaseObject g_background;
 TTF_Font* font_time = NULL;
@@ -311,7 +314,6 @@ std::string CheckPosition(const SDL_Rect& objectA, const SDL_Rect& objectB);
 std::string HitConfirm(std::string HitState, std::string Position);
 
 int main(int argc, char* argv[]){
-    Timer fps_timer;
 
     if(InitData() == false)
         return -1;
@@ -322,19 +324,29 @@ int main(int argc, char* argv[]){
     game_map.LoadMap((char*)"./map/map01.dat");
     game_map.LoadTiles(g_screen);
 
+    // Spawn player one
     PlayerObject p_player;
     p_player.LoadImg("./img/char_1/walk_right.png", g_screen);
     p_player.SetClips();
+    int HitTaken_1 = 0;
 
+    // Player one hp
+    CharOneHP player_one_hp;
+    player_one_hp.Init(g_screen);
+   
+    // Spawn player two
     PlayerObjectTwo p_player_two;
     p_player_two.LoadImg("./img/char_2/walk_left.png", g_screen);
     p_player_two.SetClips();
-
-    int HitTaken_1 = 0;
-
     int HitTaken_2 = 0;
 
+    // Player two hp
+    CharTwoHP player_two_hp;
+    player_two_hp.Init(g_screen);
+
     // Time
+    Timer fps_timer;
+
     TextObject time_game;
     time_game.SetColor(TextObject::BLACK_TEXT);
 
@@ -347,14 +359,15 @@ int main(int argc, char* argv[]){
     TextObject Position;
     Position.SetColor(TextObject::WHITE_TEXT);
 
-    bool quit_game = false;
+    bool Quit_Game = false;
 
-    while(!quit_game){
+    // Game events
+    while(!Quit_Game){
         fps_timer.start();
 
         while(SDL_PollEvent(&g_event) != 0){
             if(g_event.type == SDL_QUIT)
-                quit_game = true;
+                Quit_Game = true;
 
             p_player.HandleInputAction(g_event, g_screen);
             p_player_two.HandleInputAction(g_event, g_screen);
@@ -373,16 +386,22 @@ int main(int argc, char* argv[]){
         game_map.DrawMap(g_screen);
         Map map_data = game_map.GetMap();
 
+        // Set player one
         p_player.SetMapXY(map_data.start_x, map_data.start_y);
         p_player.DoPlayer(map_data);
         p_player.Show(g_screen);
 
+        // Set player two
         p_player_two.SetMapXY(map_data.start_x, map_data.start_y);
         p_player_two.DoPlayer(map_data);
         p_player_two.Show(g_screen);
 
         game_map.SetMap(map_data);
         game_map.DrawMap(g_screen);
+
+        // Show health
+        player_one_hp.Show(g_screen);
+        player_two_hp.Show(g_screen);
 
         // Check combat
         SDL_Rect rect_player_one = p_player.GetRectFrame();
@@ -396,10 +415,12 @@ int main(int argc, char* argv[]){
                        CheckPosition(rect_player_one, rect_player_two))
                        != "No"){
                         HitTaken_2++;
-                        if(HitTaken_2 <= 100){
+                        if(HitTaken_2 < 100){
                             p_player_two.SetRect(SCREEN_WIDTH,0);
                             p_player_two.ComeBackTime(1);
                             SDL_Delay(100);
+                            player_two_hp.Decrease();
+                            player_two_hp.Render(g_screen);
                             continue;
 
                         }
@@ -414,10 +435,12 @@ int main(int argc, char* argv[]){
                 
                 if(!p_player.Defend()){
                     HitTaken_1++;
-                    if(HitTaken_1 <= 100){
+                    if(HitTaken_1 < 100){
                         p_player.SetRect(0,0);
                         p_player.ComeBackTime(1);
                         SDL_Delay(100);
+                        player_one_hp.Decrease();
+                        player_one_hp.Render(g_screen);
                         continue;
                     }
                     else{
@@ -434,7 +457,7 @@ int main(int argc, char* argv[]){
         Uint32 time_display = 180 - time_value;
 
         if(time_display <= 0){
-            quit_game = true;
+            Quit_Game = true;
             return 0;
         }
         else{
@@ -448,7 +471,7 @@ int main(int argc, char* argv[]){
 
         // Show Lives
         std::string char_1_lives = "HP: ";
-        if(HitTaken_1 <= 10){
+        if(HitTaken_1 < 100){
             std::string display_lives_1 = std::to_string(100 - HitTaken_1);
             char_1_lives += display_lives_1;
 
@@ -458,7 +481,7 @@ int main(int argc, char* argv[]){
         }
 
         std::string char_2_lives = "HP: ";
-        if(HitTaken_2 <= 10){
+        if(HitTaken_2 < 100){
             std::string display_lives_2 = std::to_string(100 - HitTaken_2);
             char_2_lives += display_lives_2;
 

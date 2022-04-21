@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include <vector>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -34,8 +35,8 @@ static SDL_Event g_event;
 #define BLANK_TILE 0
 #define TILE_SIZE 8
 
-#define MAX_MAP_X 72
-#define MAX_MAP_Y 36
+#define MAX_MAP_X SCREEN_WIDTH/TILE_SIZE
+#define MAX_MAP_Y SCREEN_HEIGHT/TILE_SIZE
 
 struct Input{
     int left;
