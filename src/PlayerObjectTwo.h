@@ -46,6 +46,7 @@ class PlayerObjectTwo : public BaseObject{
             come_back_time = cb_time;
         };
 
+
     private:
         float horizon_distance;
         float vertical_distance;

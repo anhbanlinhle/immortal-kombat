@@ -27,13 +27,34 @@ void CharTwoHP::Init(SDL_Renderer* screen){
 
 void CharTwoHP::Show(SDL_Renderer* screen){
     for(int i = 0; i < pos_list.size(); i++){
-        rect_.x = SCREEN_WIDTH - pos_list.at(i) - 20;
-        rect_.y = 20;
+        rect_.x = SCREEN_WIDTH - pos_list.at(i) - 75 - 2;
+        rect_.y = 10;
         Render(screen);
     }
 }
 
 void CharTwoHP::Decrease(){
-    number--;
-    pos_list.pop_back();
+    for(int i = 0; i < 2; i++){
+        number--;
+        pos_list.pop_back();
+    }
+}
+
+AvatarTwo::AvatarTwo(){
+    x_pos = SCREEN_WIDTH - 75;
+    y_pos = 0;
+}
+
+AvatarTwo::~AvatarTwo(){
+
+}
+
+void AvatarTwo::Init(SDL_Renderer* screen){
+    LoadImg("./img/char_2_avatar.jpg", screen);
+}
+
+void AvatarTwo::Show(SDL_Renderer* screen){
+    rect_.x = x_pos;
+    rect_.y = y_pos; 
+    Render(screen);
 }

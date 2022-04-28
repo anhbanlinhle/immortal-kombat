@@ -40,15 +40,19 @@ void TextObject::SetColor(Uint8 red, Uint8 green, Uint8 blue){
 
 void TextObject::SetColor(int type){
     if(type == RED_TEXT){
-        SDL_Color color = {255, 0, 0};
+        SDL_Color color = {124, 13, 14};
         text_color = color;
     }
     else if(type == WHITE_TEXT){
-        SDL_Color color = {255, 255, 255};
+        SDL_Color color = {0, 0, 0};
         text_color = color;
     }
     else if(type == BLACK_TEXT){
         SDL_Color color = {0, 0, 0};
+        text_color = color;
+    }
+    else if(type == BLUE_TEXT){
+        SDL_Color color = {11, 11, 69};
         text_color = color;
     }
 }

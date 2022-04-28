@@ -12,6 +12,7 @@ class TextObject{
             RED_TEXT = 0,
             WHITE_TEXT = 1,
             BLACK_TEXT = 2,
+            BLUE_TEXT = 3,
         };
 
         bool LoadFromRenderText(TTF_Font* font, SDL_Renderer* screen);

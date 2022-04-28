@@ -329,20 +329,31 @@ int main(int argc, char* argv[]){
     p_player.LoadImg("./img/char_1/walk_right.png", g_screen);
     p_player.SetClips();
     int HitTaken_1 = 0;
+    int Lives_1 = 3;
 
     // Player one hp
     CharOneHP player_one_hp;
     player_one_hp.Init(g_screen);
+    
+   // Player one ava
+    AvatarOne player_one_ava;
+    player_one_ava.Init(g_screen);
+    
    
     // Spawn player two
     PlayerObjectTwo p_player_two;
     p_player_two.LoadImg("./img/char_2/walk_left.png", g_screen);
     p_player_two.SetClips();
     int HitTaken_2 = 0;
+    int Lives_2 = 3;
 
     // Player two hp
     CharTwoHP player_two_hp;
     player_two_hp.Init(g_screen);
+
+    // Player two ava
+    AvatarTwo player_two_ava;
+    player_two_ava.Init(g_screen);
 
     // Time
     Timer fps_timer;
@@ -351,13 +362,23 @@ int main(int argc, char* argv[]){
     time_game.SetColor(TextObject::BLACK_TEXT);
 
     TextObject Char1;
-    Char1.SetColor(TextObject::BLACK_TEXT);
+    Char1.SetColor(TextObject::BLUE_TEXT);
 
     TextObject Char2;
-    Char2.SetColor(TextObject::BLACK_TEXT);
+    Char2.SetColor(TextObject::RED_TEXT);
+
+    TextObject Lives1;
+    Lives1.SetColor(TextObject::BLUE_TEXT);
+
+    TextObject Lives2;
+    Lives2.SetColor(TextObject::RED_TEXT);
+    
 
     TextObject Position;
     Position.SetColor(TextObject::WHITE_TEXT);
+
+    TextObject Position2;
+    Position2.SetColor(TextObject::WHITE_TEXT);
 
     bool Quit_Game = false;
 
@@ -399,9 +420,36 @@ int main(int argc, char* argv[]){
         game_map.SetMap(map_data);
         game_map.DrawMap(g_screen);
 
+        // Draw basics
+        ColorData white(255, 255, 255);
+        ColorData black(0, 0, 0);
+
+        GeometricFormat health_bar_one(75, 9, 200, 12);
+        GeometricFormat health_one_outline(75, 9, 201, 12);
+
+        GeometricFormat health_bar_two(SCREEN_WIDTH - 200 - 76, 9, 201, 12);
+        GeometricFormat health_two_outline(SCREEN_WIDTH - 200 - 76, 9, 201, 12);
+
+        GeometricFormat ava_one_outline(0, 1, 76, 50);
+        GeometricFormat ava_two_outline(SCREEN_WIDTH - 76, 1, 76, 50);
+
+
+        // Show ava
+        Geometric::RenderOutline(ava_one_outline, black, g_screen);
+        Geometric::RenderOutline(ava_two_outline, black, g_screen);
+
+        player_one_ava.Show(g_screen);
+        player_two_ava.Show(g_screen);
+
         // Show health
+        Geometric::RenderRectangle(health_bar_one, white, g_screen);
+        Geometric::RenderRectangle(health_bar_two, white, g_screen);
+
         player_one_hp.Show(g_screen);
         player_two_hp.Show(g_screen);
+
+        Geometric::RenderOutline(health_one_outline, black, g_screen);
+        Geometric::RenderOutline(health_two_outline, black, g_screen);
 
         // Check combat
         SDL_Rect rect_player_one = p_player.GetRectFrame();
@@ -414,15 +462,56 @@ int main(int argc, char* argv[]){
                     if(HitConfirm(p_player.HitState(),
                        CheckPosition(rect_player_one, rect_player_two))
                        != "No"){
-                        HitTaken_2++;
+                        
+                        HitTaken_2+=2;
+                        
                         if(HitTaken_2 < 100){
-                            p_player_two.SetRect(SCREEN_WIDTH,0);
-                            p_player_two.ComeBackTime(1);
-                            SDL_Delay(100);
                             player_two_hp.Decrease();
                             player_two_hp.Render(g_screen);
+                            
+                        }
+                        else{
+                            if(Lives_2 > 0){
+                                HitTaken_2 = 0;
+                                Lives_2--;
+                                
+                                p_player_two.SetRect(SCREEN_WIDTH,0);
+                                p_player_two.ComeBackTime(1);
+                                
+                                player_two_hp.Init(g_screen);
+                                SDL_Delay(100);
+                                continue;
+                            }
+                            else{
+                                SDL_Quit();
+                                return 0;
+                            }
+                        }
+                    }
+                }
+            }
+            if(p_player_two.HitState()!= "idle"){
+                
+                if(!p_player.Defend()){
+                    
+                        HitTaken_1+=1;
+   
+                    if(HitTaken_1 < 100){
+                        player_one_hp.Decrease();
+                        player_one_hp.Render(g_screen);
+                        
+                    }
+                    else{
+                        if(Lives_1 > 0){
+                            HitTaken_1 = 0;
+                            Lives_1--;
+                            
+                            p_player.SetRect(0,0);
+                            p_player.ComeBackTime(1);
+                            
+                            player_one_hp.Init(g_screen);
+                            SDL_Delay(100);
                             continue;
-
                         }
                         else{
                             SDL_Quit();
@@ -431,26 +520,7 @@ int main(int argc, char* argv[]){
                     }
                 }
             }
-            if(p_player_two.HitState()!= "idle"){
-                
-                if(!p_player.Defend()){
-                    HitTaken_1++;
-                    if(HitTaken_1 < 100){
-                        p_player.SetRect(0,0);
-                        p_player.ComeBackTime(1);
-                        SDL_Delay(100);
-                        player_one_hp.Decrease();
-                        player_one_hp.Render(g_screen);
-                        continue;
-                    }
-                    else{
-                        SDL_Quit();
-                        return 0;
-                    }
-                }
-            }
         }
-
         // Show time
         std::string string_time = "Time: ";
         Uint32 time_value = SDL_GetTicks()/1000;
@@ -469,39 +539,72 @@ int main(int argc, char* argv[]){
             time_game.RenderText(g_screen, SCREEN_WIDTH/2 - 50, 30);
         }
 
-        // Show Lives
-        std::string char_1_lives = "HP: ";
+        // Show HP & Lives
+        std::string char_1_lives = "Lives: ";
         if(HitTaken_1 < 100){
-            std::string display_lives_1 = std::to_string(100 - HitTaken_1);
+            std::string display_lives_1 = std::to_string(Lives_1);
             char_1_lives += display_lives_1;
 
-            Char1.SetText(char_1_lives);
-            Char1.LoadFromRenderText(font_time, g_screen);
-            Char1.RenderText(g_screen, 30, 30);
+            Lives1.SetText(char_1_lives);
+            Lives1.LoadFromRenderText(font_time, g_screen);
+            Lives1.RenderText(g_screen, 5, 55);
         }
 
-        std::string char_2_lives = "HP: ";
+        std::string char_2_lives = "Lives: ";
         if(HitTaken_2 < 100){
-            std::string display_lives_2 = std::to_string(100 - HitTaken_2);
+            std::string display_lives_2 = std::to_string(Lives_2);
             char_2_lives += display_lives_2;
 
-            Char2.SetText(char_2_lives);
-            Char2.LoadFromRenderText(font_time, g_screen);
-            Char2.RenderText(g_screen, SCREEN_WIDTH - 120, 30);
+            Lives2.SetText(char_2_lives);
+            Lives2.LoadFromRenderText(font_time, g_screen);
+            Lives2.RenderText(g_screen, SCREEN_WIDTH - 95, 55);
         }
 
+        std::string char_1_hp = "HP: ";
+        if(HitTaken_1 < 100){
+            std::string display_hp_1 = std::to_string(100 - HitTaken_1);
+            char_1_hp += display_hp_1 + "%";
+
+            Char1.SetText(char_1_hp);
+            Char1.LoadFromRenderText(font_time, g_screen);
+            Char1.RenderText(g_screen, 125, 30);
+        }
+
+        std::string char_2_hp = "HP: ";
+        if(HitTaken_2 < 100){
+            std::string display_hp_2 = std::to_string(100 - HitTaken_2);
+            char_2_hp += display_hp_2 + "%";
+
+            Char2.SetText(char_2_hp);
+            Char2.LoadFromRenderText(font_time, g_screen);
+            Char2.RenderText(g_screen, SCREEN_WIDTH - 200, 30);
+        }
+
+
+        // Demo test             
         std::string hitable = "";
         if(InRange) hitable = " (in range)";
         std::string checkpos = "P2 to P1: " +
                                 CheckPosition(rect_player_one, rect_player_two) +
                                 hitable +
                                 "       " +
-                                "Action:  " +
+                                "P1 Action:  " +
                                 p_player.HitState();
+
+        std::string checkpos2 = "P1 to P2: " +
+                                CheckPosition(rect_player_two, rect_player_one) +
+                                hitable +
+                                "       " +
+                                "P2 Action:  " +
+                                p_player_two.HitState();
         
         Position.SetText(checkpos);
         Position.LoadFromRenderText(font_time, g_screen);
-        Position.RenderText(g_screen, 0, SCREEN_HEIGHT - 20);        
+        Position.RenderText(g_screen, 0, 100);
+
+        Position2.SetText(checkpos2);
+        Position2.LoadFromRenderText(font_time, g_screen);
+        Position2.RenderText(g_screen, 0, 140);         
 
 
         SDL_RenderPresent(g_screen);
@@ -514,6 +617,7 @@ int main(int argc, char* argv[]){
             int delay_time = frame_duration - real_time;
             SDL_Delay(delay_time);
         }
+        
     }    
 
     CloseApp();
@@ -552,7 +656,7 @@ bool InitData(){
     
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 
-    g_window = SDL_CreateWindow("Immortal Combat", 
+    g_window = SDL_CreateWindow("Immortal Combat (Demo)", 
                                 SDL_WINDOWPOS_UNDEFINED,
                                 SDL_WINDOWPOS_UNDEFINED,
                                 SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);

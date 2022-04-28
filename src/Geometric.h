@@ -9,10 +9,10 @@ struct GeometricFormat{
                         int top_, 
                         int width_, 
                         int height_){
-                            left_ = left,
-                            top_ = top,
-                            width_ = width,
-                            height_ = height;};
+                            left = left_,
+                            top = top_,
+                            width = width_,
+                            height = height_;};
         int left;
         int top;
         int width;
@@ -21,9 +21,11 @@ struct GeometricFormat{
 
 struct ColorData{
     
-    ColorData(Uint8 r, Uint8 g, Uint8 b){red = r, green = g, blue = b;}
+    
 
     public:
+        ColorData(Uint8 r, Uint8 g, Uint8 b){red = r, green = g, blue = b;};
+
         Uint8 red;
         Uint8 green;
         Uint8 blue;  

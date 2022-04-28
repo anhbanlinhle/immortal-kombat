@@ -21,4 +21,18 @@ class CharTwoHP : public BaseObject{
 
 };
 
+class AvatarTwo : public BaseObject{
+    public:
+        AvatarTwo();
+        ~AvatarTwo();
+
+        void Init(SDL_Renderer* screen);
+        void Show(SDL_Renderer* screen);
+        void SetPos(const int& x, const int& y){x_pos = x, y_pos = y;};
+    private:
+        int x_pos;
+        int y_pos;
+
+};
+
 #endif
